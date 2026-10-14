@@ -1,0 +1,85 @@
+CREATE DATABASE IF NOT EXISTS askme_db;
+USE askme_db;
+
+----user----
+CREATE TABLE IF NOT EXISTS users (
+    user_id    INT AUTO_INCREMENT PRIMARY KEY,
+    username   VARCHAR(50)  NOT NULL UNIQUE,
+    email      VARCHAR(100) NOT NULL UNIQUE,
+    password   VARCHAR(255) NOT NULL,          
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+----- Subjects -----
+CREATE TABLE IF NOT EXISTS subjects (
+    subject_id INT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(100) NOT NULL UNIQUE,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
+
+
+----- Topics -----
+CREATE TABLE IF NOT EXISTS topics (
+    topic_id   INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT          NOT NULL,
+    title      VARCHAR(255) NOT NULL,
+    created_by INT          NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
+    FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
+
+
+ ----- Questions -----
+CREATE TABLE IF NOT EXISTS questions (
+    question_id INT AUTO_INCREMENT PRIMARY KEY,
+    topic_id    INT  NOT NULL,
+    user_id     INT  NOT NULL,
+    content     TEXT NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (topic_id) REFERENCES topics(topic_id),
+    FOREIGN KEY (user_id)  REFERENCES users(user_id)
+);
+
+
+----- Replies -----
+CREATE TABLE IF NOT EXISTS replies (
+    reply_id    INT AUTO_INCREMENT PRIMARY KEY,
+    question_id INT  NOT NULL,
+    user_id     INT  NOT NULL,
+    content     TEXT NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (question_id) REFERENCES questions(question_id),
+    FOREIGN KEY (user_id)     REFERENCES users(user_id)
+);
+
+
+INSERT IGNORE INTO subjects (name, created_by) VALUES
+('Mathematics', NULL),
+('Science', NULL),
+('Technology', NULL),
+('English', NULL);
+
+
+INSERT INTO topics (subject_id, title, created_by) VALUES
+(1, 'Algebra', 1),
+(2, 'Physics', 2),
+(3, 'Java Programming', 3),
+(4, 'English Grammar', 4);
+
+
+INSERT INTO questions (topic_id, user_id, content) VALUES
+(1, 1, 'What is the difference between linear and quadratic equations?'),
+(2, 2, 'What is Newton''s second law of motion?'),
+(3, 3, 'What is inheritance in Java?'),
+(4, 4, 'What are the different types of tenses in English?');
+
+
+INSERT INTO replies (question_id, user_id, content) VALUES
+(1, 2, 'A linear equation has degree one, while a quadratic equation has degree two.'),
+(2, 3, 'Newton''s second law states that force is equal to mass multiplied by acceleration.'),
+(3, 4, 'Inheritance allows a Java class to acquire properties and methods from another class.'),
+(4, 1, 'The main tenses are past, present and future.');
